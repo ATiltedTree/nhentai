@@ -1,0 +1,22 @@
+name: Test
+on:
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup | Checkout
+        uses: actions/checkout@v3
+      - name: Setup | Rust
+        uses: actions-rs/toolchain@v1.0.7
+        with:
+          toolchain: stable
+          override: true
+          profile: minimal
+      - name: Setup | Cache
+        uses: Swatinem/rust-cache@v1
+      - name: Build | Test
+        run: cargo test --all-features

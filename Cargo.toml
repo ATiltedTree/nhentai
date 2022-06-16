@@ -1,0 +1,19 @@
+[package]
+name = "nhentai"
+version = "0.1.0"
+edition = "2021"
+description = "Crate for getting metadata and images from nhentai"
+repository = "https://github.com/ATiltedTree/nhentai"
+license = "MIT OR Apache-2.0"
+categories = ["api-bindings"]
+include = ["LICENSE-*", "src", "Cargo.toml", "README.md"]
+
+[dependencies]
+chrono = { version = "0.4", features = ["serde"] }
+serde = { version = "1", features = ["derive"] }
+reqwest = { version = "0.11", features = ["json"] }
+thiserror = "1"
+
+[dev-dependencies.tokio]
+version = "1"
+features = ["macros", "rt-multi-thread"]
