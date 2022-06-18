@@ -1,5 +1,3 @@
-use reqwest::StatusCode;
-
 use crate::Gallery;
 
 fn get_type(file_type: char) -> &'static str {
@@ -35,30 +33,23 @@ impl Client {
         // get a client builder
         let client = reqwest::Client::builder()
             .default_headers(headers)
-            // .user_agent("Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101 Firefox/91.0")
             .build()
             .unwrap();
 
-        Self {
-            // client: reqwest::Client::new(),
-            client,
-        }
+        Self { client }
     }
 
     pub async fn gallery(&self, id: u32) -> crate::Result<Gallery> {
-        let inner = self
+        let inner: crate::api::Result<crate::api::Gallery> = self
             .client
             .get(format!("https://nhentai.net/api/gallery/{id}"))
             .send()
+            .await?
+            .json()
             .await?;
 
-        if inner.status() == StatusCode::NOT_FOUND {
-            return Err(crate::Error::NotFound(id));
-        }
-        let inner = inner.json().await?;
-
         Ok(Gallery {
-            inner,
+            inner: inner.into_std()?,
             client: self.clone(),
         })
     }

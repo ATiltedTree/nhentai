@@ -2,10 +2,29 @@ use chrono::{serde::ts_seconds, DateTime, Utc};
 use serde::Deserialize;
 
 #[derive(Clone, Deserialize, Debug)]
+#[serde(untagged)]
+pub enum Result<T> {
+    Ok(T),
+    Err { error: String },
+}
+
+impl<T> Result<T> {
+    pub fn into_std(self) -> crate::Result<T> {
+        match self {
+            Result::Ok(v) => Ok(v),
+            Result::Err { error } => Err(match error.as_str() {
+                "does not exist" => crate::Error::DoesNotExist,
+                other => todo!("Unkown error reason '{other}'"),
+            }),
+        }
+    }
+}
+
+#[derive(Clone, Deserialize, Debug)]
 pub struct Title {
-    pub english: String,
-    pub japanese: String,
-    pub pretty: String,
+    pub english: Option<String>,
+    pub japanese: Option<String>,
+    pub pretty: Option<String>,
 }
 
 #[derive(Clone, Deserialize, Debug)]
@@ -59,7 +78,7 @@ pub struct Gallery {
     pub num_favorites: u32,
 }
 
-fn id<'de, D>(de: D) -> Result<u32, D::Error>
+fn id<'de, D>(de: D) -> std::result::Result<u32, D::Error>
 where
     D: serde::Deserializer<'de>,
 {
@@ -72,28 +91,28 @@ where
             formatter.write_str("ID")
         }
 
-        fn visit_i64<E>(self, v: i64) -> Result<Self::Value, E>
+        fn visit_i64<E>(self, v: i64) -> std::result::Result<Self::Value, E>
         where
             E: serde::de::Error,
         {
             Ok(v as u32)
         }
 
-        fn visit_u64<E>(self, v: u64) -> Result<Self::Value, E>
+        fn visit_u64<E>(self, v: u64) -> std::result::Result<Self::Value, E>
         where
             E: serde::de::Error,
         {
             Ok(v as u32)
         }
 
-        fn visit_u32<E>(self, v: u32) -> Result<Self::Value, E>
+        fn visit_u32<E>(self, v: u32) -> std::result::Result<Self::Value, E>
         where
             E: serde::de::Error,
         {
             Ok(v)
         }
 
-        fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
+        fn visit_str<E>(self, v: &str) -> std::result::Result<Self::Value, E>
         where
             E: serde::de::Error,
         {

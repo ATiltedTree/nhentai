@@ -80,15 +80,24 @@ pub struct Title<'a> {
 
 impl<'a> Title<'a> {
     pub fn pretty(&self) -> Option<&str> {
-        (!self.inner.pretty.is_empty()).then(|| self.inner.pretty.as_str())
+        self.inner
+            .pretty
+            .as_deref()
+            .and_then(|x| (!x.is_empty()).then(|| x))
     }
 
     pub fn english(&self) -> Option<&str> {
-        (!self.inner.english.is_empty()).then(|| self.inner.english.as_str())
+        self.inner
+            .english
+            .as_deref()
+            .and_then(|x| (!x.is_empty()).then(|| x))
     }
 
     pub fn japanese(&self) -> Option<&str> {
-        (!self.inner.japanese.is_empty()).then(|| self.inner.japanese.as_str())
+        self.inner
+            .japanese
+            .as_deref()
+            .and_then(|x| (!x.is_empty()).then(|| x))
     }
 }
 
