@@ -15,12 +15,12 @@ pub struct Client {
 
 impl Default for Client {
     fn default() -> Self {
-        Self::new(None)
+        Self::new(None, None)
     }
 }
 
 impl Client {
-    pub fn new(cookie: Option<&str>) -> Self {
+    pub fn new(cookie: Option<&str>, user_agent: Option<&str>) -> Self {
         use reqwest::header;
 
         let mut headers = header::HeaderMap::new();
@@ -28,6 +28,12 @@ impl Client {
             let mut cook = header::HeaderValue::from_str(cookie).unwrap();
             cook.set_sensitive(true);
             headers.insert(header::COOKIE, cook);
+        }
+        if let Some(user_agent) = user_agent {
+            headers.insert(
+                header::USER_AGENT,
+                header::HeaderValue::from_str(user_agent).unwrap(),
+            );
         }
 
         // get a client builder
